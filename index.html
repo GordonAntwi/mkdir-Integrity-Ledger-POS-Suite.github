@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Monitoring System (ILP Terminal V4.0)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom ECG Green for a professional, branded look */
+        .ecg-green {
+            background-color: #629440;
+        }
+        .text-ecg-green {
+            color: #629440;
+        }
+        .border-ecg-green {
+            border-color: #629440;
+        }
+        /* Inter font for modern look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        /* Custom switch styling */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px; /* Wider switch for prominence */
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #629440;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header & OID Link -->
+        <header class="flex flex-col sm:flex-row justify-between items-start mb-6 pb-4 border-b border-gray-300">
+            <div class="flex items-center">
+                <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight">
+                    Unified Monitoring System (ILP Terminal V4.0)
+                </h1>
+                <a href="operational_insight_dashboard.html" class="ml-4 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 flex items-center text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                    </svg>
+                    Executive Dashboard (OID)
+                </a>
+            </div>
+            <div class="mt-4 sm:mt-0 flex items-center">
+                <span class="text-sm font-medium text-gray-600 mr-3" id="system-status-label">SYSTEM OFFLINE</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="master-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column: Transaction Input & Controls -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- RAVIM Video Feed Placeholder (NEW) -->
+                <div class="bg-black rounded-xl overflow-hidden border-4 border-gray-700 mb-4 h-48 flex items-center justify-center transition-all duration-300">
+                    <div id="video-feed-placeholder" class="text-white text-lg font-mono p-4 text-center">
+                        RAVIM LIVE FEED: Waiting for Master Activation
+                        <p class="text-xs text-gray-400 mt-1">Video recording is simulated in this environment.</p>
+                    </div>
+                </div>
+                
+                <!-- Transaction Panel -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b">Cash Transaction Interface</h2>
+                    
+                    <!-- Input Section -->
+                    <div class="flex items-center space-x-4 mb-4">
+                        <label for="charge-value" class="text-lg font-medium text-gray-700 w-32">Charge Value:</label>
+                        <div class="flex flex-1">
+                            <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                GH₵
+                            </span>
+                            <input type="number" id="charge-value" placeholder="Enter amount" class="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-ecg-green focus:border-ecg-green" disabled>
+                        </div>
+                    </div>
+                    
+                    <!-- RAVIM Verification Toggle -->
+                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                        <span class="text-lg font-medium text-gray-800">RAVIM Video & Input Verification</span>
+                        <label class="toggle-switch small-switch">
+                            <input type="checkbox" id="ravim-toggle" disabled>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Voice Input Button -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <button id="mic-button" class="flex-1 bg-blue-500 text-white p-3 rounded-lg font-semibold shadow-md hover:bg-blue-600 transition duration-150 disabled:opacity-50" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7v0a7 7 0 01-7-7v-1.5M12 18v3m3-3v3m-6-3v3M9 11v1a3 3 0 006 0v-1m-3 0a3 3 0 00-3-3m0 0a3 3 0 013-3m0 0a3 3 0 013 3" />
+                            </svg>
+                            Voice Input (STT)
+                        </button>
+                    </div>
+                    
+                    <!-- Process Button -->
+                    <button id="process-button" class="w-full ecg-green text-white p-4 rounded-xl font-bold text-xl shadow-lg hover:bg-green-700 transition duration-150 disabled:opacity-50" disabled>
+                        PROCESS TRANSACTION
+                    </button>
+                </div>
+
+                <!-- RAVIM Status Monitor -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b">RAVIM Integrity Status</h2>
+                    <div id="ravim-status-output" class="p-4 rounded-lg text-lg font-medium text-center bg-yellow-100 text-yellow-800 border border-yellow-300 transition duration-300">
+                        System Awaiting Activation
+                    </div>
+                    <div id="match-indicator" class="mt-4 flex flex-col sm:flex-row justify-between items-center text-sm font-mono p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600">Camera Scan: <span id="camera-scan-value" class="font-bold">GH₵ 0.00</span></span>
+                        <span class="text-gray-600 mt-2 sm:mt-0">Manual Input: <span id="manual-input-value" class="font-bold">GH₵ 0.00</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: AI Console & Sensory Status -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Cognitive Mastery Console (CMC) - The modular part -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b">Cognitive Mastery Console</h2>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between font-medium">
+                            <span>Mastery Level:</span>
+                            <span id="ai-mastery-level" class="font-bold text-blue-600">Novice (Needs Training)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Total Data Processed:</span>
+                            <span id="ai-data-processed" class="font-mono text-gray-600">1,500 units</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Current Mismatch Error:</span>
+                            <span id="ai-error-rate" class="font-mono text-red-500">55% (High)</span>
+                        </div>
+                    </div>
+                    
+                    <button id="train-ai-button" class="w-full mt-6 bg-purple-600 text-white p-3 rounded-lg font-semibold shadow-md hover:bg-purple-700 transition duration-150 disabled:opacity-50" disabled>
+                        TRAIN AI SIMULATION
+                    </button>
+                </div>
+
+                <!-- Sensory Status Monitor -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b">Operator Sensory Status</h2>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span>Facial Focus Monitor:</span>
+                            <span id="face-status" class="font-medium text-green-500">Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Environment Light (Lux):</span>
+                            <span id="light-level" class="font-medium text-yellow-600">300 (Optimal)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Operator Fatigue Index:</span>
+                            <span id="fatigue-index" class="font-medium text-gray-600">3.2 / 10.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The script that remains in the main file (core functions) -->
+    <script>
+        // --- Core System DOM Constants ---
+        const MASTER_TOGGLE = document.getElementById('master-toggle');
+        const RAVIM_TOGGLE = document.getElementById('ravim-toggle');
+        const CHARGE_VALUE_INPUT = document.getElementById('charge-value');
+        const PROCESS_BUTTON = document.getElementById('process-button');
+        const MIC_BUTTON = document.getElementById('mic-button');
+        const RAVIM_STATUS_OUTPUT = document.getElementById('ravim-status-output');
+        const CAMERA_SCAN_SPAN = document.getElementById('camera-scan-value');
+        const MANUAL_INPUT_SPAN = document.getElementById('manual-input-value');
+        const SYSTEM_STATUS_LABEL = document.getElementById('system-status-label');
+        const VIDEO_FEED_PLACEHOLDER = document.getElementById('video-feed-placeholder'); // NEW CONSTANT
+
+        // Speech Recognition setup (Browser prefixes)
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        
+        // Custom Modal Function (used by both main app and external AI module)
+        window.showConfirmationModal = function(message, isSuccess = true) {
+            // Find existing modal or create one
+            let modalDiv = document.getElementById('customModal');
+            if (!modalDiv) {
+                modalDiv = document.createElement('div');
+                modalDiv.id = 'customModal';
+                modalDiv.className = 'fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 opacity-0 pointer-events-none';
+                document.body.appendChild(modalDiv);
+            }
+
+            const bgColor = isSuccess ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+            const icon = isSuccess ? 
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' :
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.398 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+
+            const modalHtml = `
+                <div class="bg-white p-6 rounded-xl shadow-2xl transform transition-transform duration-300 scale-95 max-w-sm w-full">
+                    <div class="p-4 rounded-lg ${bgColor} border flex items-center">
+                        ${icon}
+                        <p class="font-semibold text-sm">${message}</p>
+                    </div>
+                    <button onclick="document.getElementById('customModal').classList.add('opacity-0', 'pointer-events-none'); document.getElementById('customModal').classList.remove('opacity-100');" class="mt-4 w-full ecg-green text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-150">
+                        Dismiss
+                    </button>
+                </div>
+            `;
+            
+            modalDiv.innerHTML = modalHtml;
+            // Display the modal
+            modalDiv.classList.remove('opacity-0', 'pointer-events-none');
+            modalDiv.classList.add('opacity-100');
+        }
+
+        /** Toggles all system controls when the master switch is flipped. */
+        function toggleSystem(isOn) {
+            RAVIM_TOGGLE.disabled = !isOn;
+            CHARGE_VALUE_INPUT.disabled = !isOn;
+            PROCESS_BUTTON.disabled = !isOn;
+            
+            // AI Training Button is managed by the external JS module, but we can manage its disabled state here
+            const TRAIN_AI_BUTTON = document.getElementById('train-ai-button');
+            if (TRAIN_AI_BUTTON) {
+                TRAIN_AI_BUTTON.disabled = !isOn;
+            }
+
+            // STT button only works if system is ON and supported
+            MIC_BUTTON.disabled = !isOn || !SpeechRecognition;
+
+            // Update Status Label
+            SYSTEM_STATUS_LABEL.textContent = isOn ? 'SYSTEM LIVE' : 'SYSTEM OFFLINE';
+            SYSTEM_STATUS_LABEL.classList.toggle('text-ecg-green', isOn);
+            SYSTEM_STATUS_LABEL.classList.toggle('text-gray-600', !isOn);
+            
+            // Update RAVIM Video Feed Placeholder
+            if (VIDEO_FEED_PLACEHOLDER) {
+                if (isOn) {
+                    VIDEO_FEED_PLACEHOLDER.innerHTML = 'RAVIM LIVE FEED: ACTIVE | Scanning Cash Tray... <p class="text-xs text-gray-400 mt-1">Video recording is simulated in this environment.</p>';
+                    VIDEO_FEED_PLACEHOLDER.parentElement.classList.remove('bg-black', 'border-gray-700');
+                    VIDEO_FEED_PLACEHOLDER.parentElement.classList.add('bg-gray-800', 'border-ecg-green');
+                } else {
+                    VIDEO_FEED_PLACEHOLDER.innerHTML = 'RAVIM LIVE FEED: Waiting for Master Activation <p class="text-xs text-gray-400 mt-1">Video recording is simulated in this environment.</p>';
+                    VIDEO_FEED_PLACEHOLDER.parentElement.classList.remove('bg-gray-800', 'border-ecg-green');
+                    VIDEO_FEED_PLACEHOLDER.parentElement.classList.add('bg-black', 'border-gray-700');
+                }
+            }
+
+            // Update RAVIM output on state change
+            RAVIM_STATUS_OUTPUT.textContent = isOn ? 'Awaiting Input for Verification' : 'System Awaiting Activation';
+            RAVIM_STATUS_OUTPUT.className = `p-4 rounded-lg text-lg font-medium text-center transition duration-300 ${isOn ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-yellow-100 text-yellow-800 border border-yellow-300'}`;
+            
+            // If the system turns ON, call the external AI module's initializer
+            if (isOn && window.initializeCMC) {
+                window.initializeCMC();
+            }
+        }
+        
+        /** Simulates the RAVIM camera scan (should be a real API call) */
+        function getCameraScanValue() {
+            const manualInput = parseFloat(CHARGE_VALUE_INPUT.value) || 0;
+            // Access the function exposed by the external module (js/ai-core.js)
+            const errorRate = window.getCurrentAIErrorRate ? window.getCurrentAIErrorRate() : 0.55; 
+            
+            if (Math.random() < errorRate) { // Use the error rate as a probability (0.55 means 55% chance of mismatch)
+                // Simulate Mismatch (e.g., +/- 10% variance)
+                const variance = manualInput * (Math.random() * 0.2 - 0.1); // +/- 10%
+                return (manualInput + variance).toFixed(2);
+            }
+            return manualInput.toFixed(2); // Match
+        }
+        
+        /** Main verification logic called on input change or RAVIM toggle */
+        function verifyCashInput() {
+            const manualInput = (parseFloat(CHARGE_VALUE_INPUT.value) || 0).toFixed(2);
+            
+            MANUAL_INPUT_SPAN.textContent = `GH₵ ${manualInput}`;
+            
+            if (RAVIM_TOGGLE.checked) {
+                // 1. Get Simulated Camera Scan
+                const cameraScan = getCameraScanValue();
+                CAMERA_SCAN_SPAN.textContent = `GH₵ ${cameraScan}`;
+                
+                // 2. Compare Values
+                if (Math.abs(parseFloat(manualInput) - parseFloat(cameraScan)) < 0.01) { // Check if they are nearly equal
+                    RAVIM_STATUS_OUTPUT.textContent = 'INTEGRITY PASS: Camera & Input Match';
+                    RAVIM_STATUS_OUTPUT.className = 'p-4 rounded-lg text-lg font-medium text-center transition duration-300 bg-green-100 text-green-800 border border-green-300';
+                    PROCESS_BUTTON.disabled = false;
+                } else {
+                    RAVIM_STATUS_OUTPUT.textContent = `INTEGRITY FAIL: Mismatch Detected (Manual: ${manualInput}, Scan: ${cameraScan})`;
+                    RAVIM_STATUS_OUTPUT.className = 'p-4 rounded-lg text-lg font-medium text-center transition duration-300 bg-red-100 text-red-800 border border-red-300';
+                    PROCESS_BUTTON.disabled = true; // Block processing on failure
+                }
+            } else {
+                RAVIM_STATUS_OUTPUT.textContent = 'RAVIM Disabled - Verification Bypass';
+                RAVIM_STATUS_OUTPUT.className = 'p-4 rounded-lg text-lg font-medium text-center transition duration-300 bg-yellow-100 text-yellow-800 border border-yellow-300';
+                PROCESS_BUTTON.disabled = false; // Allow processing if RAVIM is bypassed
+            }
+        }
+        
+        /** Initializes Speech-to-Text */
+        function setupSTT() {
+            if (!SpeechRecognition) return;
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            MIC_BUTTON.onclick = () => {
+                try {
+                    MIC_BUTTON.textContent = 'Listening...';
+                    MIC_BUTTON.classList.add('bg-red-500', 'animate-pulse');
+                    MIC_BUTTON.classList.remove('bg-blue-500');
+                    recognition.start();
+                } catch (e) {
+                    // Prevent common 'already started' error
+                    showConfirmationModal('Voice input already active or error.', false);
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                const numberMatch = speechResult.match(/(\d+\.?\d*)/); // Find first number
+                if (numberMatch) {
+                    CHARGE_VALUE_INPUT.value = parseFloat(numberMatch[0]);
+                    verifyCashInput(); // Re-verify input after STT
+                } else {
+                    showConfirmationModal('Could not recognize a monetary value.', false);
+                }
+            };
+
+            recognition.onend = () => {
+                MIC_BUTTON.textContent = 'Voice Input (STT)';
+                MIC_BUTTON.classList.add('bg-blue-500');
+                MIC_BUTTON.classList.remove('bg-red-500', 'animate-pulse');
+            };
+
+            recognition.onerror = (event) => {
+                console.error('STT Error:', event.error);
+                showConfirmationModal(`STT Error: ${event.error}`, false);
+            };
+        }
+        
+        // --- Initialization and Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Set up master toggle listener
+            MASTER_TOGGLE.addEventListener('change', (e) => {
+                toggleSystem(e.target.checked);
+            });
+            
+            // 2. Set initial state to OFF
+            MASTER_TOGGLE.checked = false;
+            toggleSystem(false);
+
+            // 3. Set up RAVIM/Input listeners (only active when system is ON)
+            RAVIM_TOGGLE.addEventListener('change', verifyCashInput);
+            CHARGE_VALUE_INPUT.addEventListener('input', verifyCashInput);
+            
+            PROCESS_BUTTON.addEventListener('click', () => {
+                const amount = CHARGE_VALUE_INPUT.value;
+                const message = `Transaction Processed: GH₵ ${amount}. Audit recorded.`;
+                showConfirmationModal(message);
+            });
+            
+            // 4. Set up Speech-to-Text
+            setupSTT();
+
+            // 5. Initial CMC check (this will call initializeCMC from the external module if loaded)
+            if (window.initializeCMC) {
+                window.initializeCMC();
+            }
+        });
+    </script>
+    
+    <!-- MODULARIZATION: Load external AI Core Logic -->
+    <script type="module" src="js/ai-core.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Insight Dashboard (OID)</title>
+    <!-- Load Tailwind CSS for modern, clean look -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+        }
+        /* Custom brand colors for OID - Purple/Blue for Analytics */
+        .oid-blue {
+            background-color: #4c51bf;
+        }
+        .text-oid-blue {
+            color: #4c51bf;
+        }
+        .shadow-oid {
+            box-shadow: 0 10px 15px -3px rgba(76, 81, 191, 0.1), 0 4px 6px -2px rgba(76, 81, 191, 0.05);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-10 pb-4 border-b border-gray-300">
+            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
+                Operational Insight Dashboard (OID)
+            </h1>
+            <div class="mt-4 sm:mt-0">
+                <p class="text-sm font-medium text-gray-500">
+                    Data Source: Enterprise Java Aggregator API
+                </p>
+                <button onclick="fetchAndRenderMetrics()" class="oid-blue text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition duration-150 mt-1">
+                    Refresh Real-time Metrics
+                </button>
+            </div>
+        </header>
+
+        <!-- Sensory Status Monitor (Simulated) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10" id="metrics-summary">
+            <!-- Placeholder Card Structure -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Transactions</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1" id="transactions-processed">--</p>
+                <p class="text-xs text-green-500 mt-2">+1.5M Lifetime</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Integrity Checks Passed</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1" id="checks-passed">--</p>
+                <p class="text-xs text-gray-500 mt-2">Verified by AI (RAVIM)</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Mismatch Error Rate</p>
+                <p class="text-3xl font-bold text-red-600 mt-1" id="mismatch-rate">--</p>
+                <p class="text-xs text-red-500 mt-2">Target: Below 0.01%</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Operator Fatigue Locks</p>
+                <p class="text-3xl font-bold text-orange-500 mt-1" id="fatigue-locks">--</p>
+                <p class="text-xs text-gray-500 mt-2">Forced Focus Breaks</p>
+            </div>
+
+        </div>
+
+        <!-- Charts and Detailed Analytics (Simulated Chart) -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 mb-10">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Weekly Operational Performance</h2>
+            <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                <p class="text-gray-500">
+                    [Placeholder for D3.js or Chart.js Visualization] <br>
+                    Displaying Trends in Transaction Volume and Mismatch Spikes
+                </p>
+            </div>
+        </div>
+
+        <!-- Technical Status -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Technical Status Overview</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div><span class="font-medium">Backend Service:</span> <span class="text-green-600 font-bold">Java Aggregator (Live)</span></div>
+                <div><span class="font-medium">Last Refresh:</span> <span id="last-refresh">Initializing...</span></div>
+                <div><span class="font-medium">Data Latency:</span> <span class="text-green-600">~5ms (Simulated)</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- API Integration and Data Fetching Logic (Simulated Backend) ---
+
+        // Constants for DOM elements
+        const TXN_PROCESSED = document.getElementById('transactions-processed');
+        const CHECKS_PASSED = document.getElementById('checks-passed');
+        const MISMATCH_RATE = document.getElementById('mismatch-rate');
+        const FATIGUE_LOCKS = document.getElementById('fatigue-locks');
+        const LAST_REFRESH = document.getElementById('last-refresh');
+
+        // Initial simulated metrics (matching the Java backend structure)
+        let totalTransactionsProcessed = 1548290;
+        let totalFatigueLocks = 987;
+        let aggregateMismatchRate = 0.0015;
+
+        /**
+         * Simulates fetching operational metrics from the robust Java backend API.
+         * In a real system, this would be a secure `fetch('/api/v1/metrics')` call.
+         */
+        function fetchOperationalMetrics() {
+            // Randomly update metrics slightly to simulate real-time activity
+            totalTransactionsProcessed += Math.floor(Math.random() * 50) + 10;
+            totalFatigueLocks += Math.random() < 0.1 ? 1 : 0; // Small chance of new lock
+
+            // Simulating the Java Service's output structure
+            return {
+                transactions_processed: totalTransactionsProcessed,
+                checks_passed: totalTransactionsProcessed - (totalFatigueLocks * 5),
+                mismatch_rate: aggregateMismatchRate,
+                fatigue_locks: totalFatigueLocks,
+                camera_failure_rate: 0.00005 
+            };
+        }
+
+        /**
+         * Renders the fetched metrics onto the dashboard cards.
+         */
+        window.fetchAndRenderMetrics = function() {
+            const metrics = fetchOperationalMetrics();
+            
+            // 1. Format and Render Transactional Data
+            TXN_PROCESSED.textContent = metrics.transactions_processed.toLocaleString();
+            CHECKS_PASSED.textContent = metrics.checks_passed.toLocaleString();
+
+            // 2. Format and Render Error Data
+            const mismatchPercent = (metrics.mismatch_rate * 100).toFixed(4) + '%';
+            MISMATCH_RATE.textContent = mismatchPercent;
+            
+            // 3. Format and Render Safety Data
+            FATIGUE_LOCKS.textContent = metrics.fatigue_locks.toLocaleString();
+            
+            // 4. Update Timestamp
+            const now = new Date();
+            LAST_REFRESH.textContent = now.toLocaleTimeString();
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndRenderMetrics(); // Initial data load
+            // Set up interval for auto-refresh (simulating real-time feed)
+            setInterval(fetchAndRenderMetrics, 5000); // Refresh every 5 seconds
+        });
+
+    </script>
+</body>
+</html>
